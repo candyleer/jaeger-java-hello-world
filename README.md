@@ -43,3 +43,5 @@ and start a new terminal to start `jaeger-demo-b`
 curl http://localhost:8080/a/hello
 ```
 - then visit `http://localhost:16686` you will find some trace has been generated like this.
+![example](example.png)
+![dag](dag.png)
