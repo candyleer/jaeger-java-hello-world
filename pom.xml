@@ -8,8 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>jaeger-demo-b</name>
-    <description>jaeger-demo-b</description>
+    <name>jaeger-demo</name>
+    <description>jaeger-demo</description>
 
     <modules>
         <module>jaeger-demo-a</module>
