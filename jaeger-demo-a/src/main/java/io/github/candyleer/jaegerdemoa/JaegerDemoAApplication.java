@@ -3,6 +3,7 @@ package io.github.candyleer.jaegerdemoa;
 import com.uber.jaeger.Tracer;
 import com.uber.jaeger.reporters.RemoteReporter;
 import com.uber.jaeger.samplers.ConstSampler;
+import com.uber.jaeger.senders.UdpSender;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.tag.Tags;
@@ -34,15 +35,21 @@ public class JaegerDemoAApplication {
 
     public static Tracer mockMysqlTracer;
 
+    private static final String AGENT_HOST = "127.0.0.1";
+
     public static OkHttpClient client = new OkHttpClient();
 
     public static void main(String[] args) {
         tracer = new Tracer.Builder("jaeger-demo-a")
-                .withReporter(new RemoteReporter.Builder().build())
+                .withReporter(new RemoteReporter.Builder()
+                        .withSender(new UdpSender(AGENT_HOST, 6831, 0))
+                        .build())
                 .withSampler(new ConstSampler(true))
                 .build();
         mockMysqlTracer = new Tracer.Builder("jaeger-demo-mysql")
-                .withReporter(new RemoteReporter.Builder().build())
+                .withReporter(new RemoteReporter.Builder()
+                        .withSender(new UdpSender(AGENT_HOST, 6831, 0))
+                        .build())
                 .withSampler(new ConstSampler(true))
                 .build();
         SpringApplication.run(JaegerDemoAApplication.class, args);

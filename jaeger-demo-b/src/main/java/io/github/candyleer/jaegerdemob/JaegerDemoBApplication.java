@@ -3,6 +3,7 @@ package io.github.candyleer.jaegerdemob;
 import com.uber.jaeger.Tracer;
 import com.uber.jaeger.reporters.RemoteReporter;
 import com.uber.jaeger.samplers.ConstSampler;
+import com.uber.jaeger.senders.UdpSender;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,17 +19,23 @@ import java.util.Collections;
 @SpringBootApplication
 public class JaegerDemoBApplication {
 
+    private static final String AGENT_HOST = "127.0.0.1";
+
     public static Tracer tracer;
 
     public static Tracer jedisTracer;
 
     public static void main(String[] args) {
         tracer = new Tracer.Builder("jaeger-demo-b")
-                .withReporter(new RemoteReporter.Builder().build())
+                .withReporter(new RemoteReporter.Builder()
+                        .withSender(new UdpSender(AGENT_HOST, 6831, 0))
+                        .build())
                 .withSampler(new ConstSampler(true))
                 .build();
         jedisTracer = new Tracer.Builder("jaeger-demo-redis")
-                .withReporter(new RemoteReporter.Builder().build())
+                .withReporter(new RemoteReporter.Builder()
+                        .withSender(new UdpSender(AGENT_HOST, 6831, 0))
+                        .build())
                 .withSampler(new ConstSampler(true))
                 .build();
         SpringApplication.run(JaegerDemoBApplication.class, args);
