@@ -1,14 +1,18 @@
 # jaeger-java-hello-world
 > simple example for jaeger tracing system, easy to understand, easy to develop
 
-this project is an example for [jaeger project](https://github.com/candyleer/jaeger-client-java)
+this project is an example for [jaeger project](https://github.com/candyleer/jaeger-client-java) which implement [opentracing](http://opentracing.io/documentation/)
+some basic concepts you may learn from here .
 
-#### why this project exist?
+this is a `custom code` to trace for current example ,after learning about this,you may want to do the tracing by 
+don't modify this `business code`,which means `instrument quietly`,this will be done in project [jaeger-java-agent](https://github.com/candyleer/jaeger-java-agent) in the future.
+
+### why this project exist?
 when i know about  jaeger, i have many question by how to start,how to understand these concepts in opentracing and jaeger
 i remember that i follow the `nodejs` code to start the `java` code.
 so i want to create these example to instruct some guys who need.
 
-#### steps:
+### steps:
 
 - download the jaeger environment by run docker command:
 ```bash
