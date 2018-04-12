@@ -1,4 +1,4 @@
-FROM openjdk:8u162-jre-slim
+FROM openzipkin/jre-full:1.8.0_152
 VOLUME /tmp
 ADD jaeger-demo-a/target/jaeger-demo-a-*.jar a.jar
 ADD jaeger-demo-b/target/jaeger-demo-b-*.jar b.jar
