@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +40,8 @@ public class JaegerDemoAApplication {
 
     public static OkHttpClient client = new OkHttpClient();
 
-    public static void main(String[] args) {
+    @PostConstruct
+    public void init() {
         tracer = new Tracer.Builder("jaeger-demo-a")
                 .withReporter(new RemoteReporter.Builder()
                         .withSender(new UdpSender(AGENT_HOST, 6831, 0))
@@ -52,14 +54,16 @@ public class JaegerDemoAApplication {
                         .build())
                 .withSampler(new ConstSampler(true))
                 .build();
+    }
+
+    public static void main(String[] args) {
         SpringApplication.run(JaegerDemoAApplication.class, args);
     }
 
     @GetMapping("hello")
     public Object hello() throws IOException, InterruptedException {
         HashMap<String, String> map = new HashMap<>();
-        Request.Builder builder = new Request
-                .Builder()
+        Request.Builder builder = new Request.Builder()
                 .url("http://localhost:8081/b/hello");
         tracer.buildSpan("okhttp")
                 .startActive(true);
@@ -70,7 +74,6 @@ public class JaegerDemoAApplication {
         }
         Request request = builder.build();
         try (Response response = client.newCall(request).execute()) {
-
         } finally {
             tracer.scopeManager().active().close();
         }
