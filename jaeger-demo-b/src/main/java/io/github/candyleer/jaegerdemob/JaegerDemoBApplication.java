@@ -1,9 +1,9 @@
 package io.github.candyleer.jaegerdemob;
 
-import com.uber.jaeger.Tracer;
-import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.samplers.ConstSampler;
-import com.uber.jaeger.senders.UdpSender;
+import io.jaegertracing.Tracer;
+import io.jaegertracing.reporters.RemoteReporter;
+import io.jaegertracing.samplers.ConstSampler;
+import io.jaegertracing.senders.UdpSender;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
