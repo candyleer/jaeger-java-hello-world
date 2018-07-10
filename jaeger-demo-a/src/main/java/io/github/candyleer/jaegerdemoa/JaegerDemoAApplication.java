@@ -7,14 +7,18 @@ import io.jaegertracing.senders.UdpSender;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.tag.Tags;
+import io.opentracing.util.AutoFinishScope;
+import io.opentracing.util.AutoFinishScopeManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -40,6 +44,11 @@ public class JaegerDemoAApplication {
 
     public static OkHttpClient client = new OkHttpClient();
 
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+
     @PostConstruct
     public void init() {
         tracer = new Tracer.Builder("jaeger-demo-a")
@@ -47,6 +56,7 @@ public class JaegerDemoAApplication {
                         .withSender(new UdpSender(AGENT_HOST, 6831, 0))
                         .build())
                 .withSampler(new ConstSampler(true))
+                .withScopeManager(new AutoFinishScopeManager())
                 .build();
         mockMysqlTracer = new Tracer.Builder("jaeger-demo-mysql")
                 .withReporter(new RemoteReporter.Builder()
@@ -85,6 +95,35 @@ public class JaegerDemoAApplication {
         Thread.sleep(1000);
         mockMysqlTracer.scopeManager().active().close();
         return Collections.singletonMap("hello", "a");
+    }
+
+    @GetMapping("async")
+    public Object async() throws InterruptedException {
+        Thread.sleep(1000);
+        AutoFinishScope.Continuation capture = ((AutoFinishScope) tracer.scopeManager().active()).capture();
+        new Thread(new TestRunner(capture)).start();
+        return "async";
+
+    }
+
+
+    private static class TestRunner implements Runnable {
+
+        private AutoFinishScope.Continuation capture;
+
+        public TestRunner(AutoFinishScope.Continuation capture) {
+            this.capture = capture;
+        }
+
+        @Override
+        public void run() {
+            try (AutoFinishScope activate = capture.activate()) {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
 
